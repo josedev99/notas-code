@@ -1,0 +1,24 @@
+#Selectize, configuraciones para evitar que se anteponga en otro selectize o cerra la perder focus
+
+{
+        maxItems: null,
+        delimiter: ",",
+        plugins: ['remove_button'],
+        persist: false,
+        closeAfterSelect: true,
+        onFocus: function () {
+            closeAllSelectizeExcept(this);
+        },
+        onInitialize: function() {
+                this.$control.css({
+                'height': 'auto',
+                'min-height': '38px',
+            });
+        },
+        onItemAdd: function() {
+            this.$control.css('height', 'auto');
+        },
+        onItemRemove: function() {
+            this.$control.css('height', 'auto');
+        }
+    }
