@@ -1,0 +1,4 @@
+@php
+    $url = "URL";
+    $barcode = DNS2D::getBarcodeHTML($url, 'QRCODE','2','2');
+@endphp
