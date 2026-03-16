@@ -81,3 +81,51 @@ Swal.fire({
         impVinetaLote(dataOrdersImp);
     }
 });
+
+
+/* Swal spinner modern */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #4e73df;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.swal2-popup.modern-popup {
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.swal2-title.modern-title {
+    font-weight: 600;
+    color: #2e2e2e;
+    font-size: 1.25rem;
+}
+
+
+Swal.fire({
+        title: 'Generando...',
+        html: `
+            <div style="display: flex; align-items: center; flex-direction: column; gap: 15px;">
+                <div class="spinner"></div>
+                <span style="font-size: 14px; color: #555;">Por favor, espere un momento</span>
+            </div>
+        `,
+        background: '#ffffff',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        customClass: {
+            popup: 'modern-popup',
+            title: 'modern-title'
+        }
+    });
