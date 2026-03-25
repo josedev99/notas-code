@@ -1,0 +1,98 @@
+public function generarTicket(Request $request){
+        $empresa_id = Auth::user()->empresa_id;
+
+        $printer_account = BarcodePrinters::where('empresa_id', $empresa_id)->first();
+        
+        if(!$printer_account){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se ha configurado una impresora para ticket.'
+            ]);
+        }
+
+        $datos = json_decode($request->get('data'));
+
+        $venta_id = Crypt::decrypt($datos->id);
+        $cod_venta = $datos->cod_venta;
+        
+
+        $anchoPt = 226.77; // 226.77 => 80 mm
+        $altoPt  = 700;    // alto suficiente para ticket largo
+
+        $empresa = Empresa::where('id', $empresa_id)->first();
+
+        $venta = DB::table('ventas')->where('id', $venta_id)->first();
+
+        $cliente = DB::table('clientes')->where('id', $venta->cliente_id)->first();
+
+        $detalle_venta = DB::table('det_ventas')->where('numero_venta', $venta->numero_venta)->get();
+
+        $pdf = PDF::loadView('Modulos.Venta.pdf.ticket_venta',compact('empresa', 'venta', 'detalle_venta', 'cliente'));
+        $pdf->setPaper([0, 0, $anchoPt, $altoPt], 'portrait');
+        //return $pdf->stream('ticket_OC_'.$cod_venta.'.pdf');
+
+        $filename = 'ticket_' . $venta->numero_venta . '.pdf';
+        Storage::disk('public')->put('temporal/' . $filename, $pdf->output());
+        $url =config('app.url') . Storage::url('temporal/' . $filename);
+
+        $url = str_replace('localhost', 'localhost:8000', $url); //Test local
+
+        $printStatus = $this->printTicket($printer_account['name_printer'], $url);
+
+        DeleteTempPdfJob::dispatch($filename)->delay(now()->addMinutes(2));
+
+        if($printStatus){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'La impresión del ticket se completó correctamente.'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Ha ocurrido un error en la impresión del ticket.'
+        ]);
+
+        /* return response()->json([
+            'status' => 'success',
+            'message' => 'PDF generado correctamente.',
+            'filename' => 'ticket_OC_' . $cod_venta . '.pdf',
+            'mime' => 'application/pdf',
+            'pdf_base64' => base64_encode($pdf->output()),
+            'pdf_data_uri' => 'data:application/pdf;base64,' . base64_encode($pdf->output()),
+        ]); */
+    }
+
+    function generarTicket(datos = {}){
+    //printDetOrden(datos)
+    
+    loaderAlert('Generando ticket de compra');
+    axios.post(route('venta.ticket.compra'), {data: JSON.stringify(datos)})
+    .then((response) => {
+        Swal.close();
+        console.log(response);
+        let data = response.data;
+        if(data.status === "success"){
+            Swal.fire({
+                title: 'Exito',
+                text: data.message,
+                icon: 'success'
+            });
+        }else{
+            Swal.fire({
+                title: 'Atención',
+                text: data.message,
+                icon: 'warning'
+            });
+        }
+        /* const pdfBase64 = response.data.pdf_data_uri;
+        const iframe = document.getElementById('ticketPdfFrame');
+        iframe.src = pdfBase64;
+        iframe.style.display = 'block';
+
+        $("#modalTicketPdf").modal('show'); */
+    }).catch((err) => {
+        Swal.close();
+        console.log(err);
+    });
+}
