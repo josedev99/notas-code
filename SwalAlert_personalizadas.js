@@ -129,3 +129,53 @@ Swal.fire({
             title: 'modern-title'
         }
     });
+
+
+/*  SWAL CONFIRM CUSTOMIZADO */
+
+Swal.fire({
+            title: `Agregar firma y sello digital?`,
+            html: `
+                <div class="text-center px-2">
+                    <p class="text-secondary mb-2" style="font-size: 15px;">
+                        Está a punto de generar el PDF de resultados de la orden:
+                    </p>
+
+                    <div class="bg-light rounded-4 py-2 px-3 d-inline-block border">
+                        <span class="fw-bold text-dark fs-5">
+                            #${cod_orden_html}
+                        </span>
+                    </div>
+
+                    <p class="text-muted mt-3 mb-0" style="font-size: 14px;">
+                        ¿Desea incluir la firma y el sello digital en el documento?
+                    </p>
+                </div>
+            `,
+
+            showCancelButton: true,
+            focusConfirm: false,
+            reverseButtons: true,
+            buttonsStyling: false,
+
+            confirmButtonText: `
+                <i class="bi bi-shield-check me-1"></i>
+                Con firma digital
+            `,
+
+            cancelButtonText: `
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                Generar normal
+            `,
+
+            customClass: {
+                popup: "border-0 shadow rounded-5 p-3",
+                confirmButton: "btn btn-success rounded-pill px-4 py-2",
+                cancelButton: "btn btn-light border rounded-pill px-4 py-2 me-2"
+            },
+
+            background: "#ffffff",
+            width: 500
+        }).then((result) => {
+    
+        })
